@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  meu-estoque-app-react:
+    image: node:24
+    volumes:
+      - ./test:/test
+      - ../MeuEstoqueApp:/MeuEstoqueApp
+    ports:
+    - "8080:80"
+    - "19000:19000"
+    - "19001:19001"
+    command: >
+      bash -c "node /test/server.js"
