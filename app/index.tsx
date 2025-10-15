@@ -4,9 +4,11 @@ import MeuEstoque from "./meuEstoque";
 const Drawer = createDrawerNavigator();
 
 export default function Index() {
-  return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Meu Estoque" component={MeuEstoque} />
-    </Drawer.Navigator>
-  );
+    
+
+    return (
+        <Drawer.Navigator>
+            <Drawer.Screen name="Meu Estoque" component={MeuEstoque} />
+        </Drawer.Navigator>
+    );
 }

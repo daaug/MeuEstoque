@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Text, View, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Platform } from 'react-native';
 import NewSection from './modal/newSection';
+import { getAllSection, getSection, initializeDatabase, setSection } from './database/initializeDatabase';
 
 let myObject = {
   a: 1,
@@ -10,10 +11,24 @@ let myObject = {
   d: 4,
 };
 
+async function runDB(){
+    try {
+        initializeDatabase();
+        setSection("Farinha");
+        const result = await getAllSection();
+        console.log("Resultado: ", result);
+
+    } catch(e){
+        console.error(e);
+    }
+}
+
 export default function MeuEstoque() {
   const [isSectionModalVisible, setIsSectionModalVisible] = useState(false);
   const openSectionModal = () => setIsSectionModalVisible(true);
-  function closeSectionModal () { setIsSectionModalVisible(false) };
+  const closeSectionModal = () => setIsSectionModalVisible(false);
+
+  runDB();
 
   return (
     <View style={styles.container}>
@@ -36,6 +51,7 @@ export default function MeuEstoque() {
           <MaterialIcons name="add" size={30} color="#007AFF" />
           <Text>Cadastrar Nova Seção</Text>
         </TouchableOpacity>
+
       </View>
 
     </View>

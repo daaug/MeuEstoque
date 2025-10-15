@@ -1,10 +1,13 @@
-import { type SQLiteDatabase } from "expo-sqlite";
+import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
 
-export async function initializeDatabase(database: SQLiteDatabase) {
-  await database.execAsync(
+export const getDBConnection = async (): Promise<SQLiteDatabase> => {
+    return await openDatabaseAsync('MeuEstoque.db');
+};
+
+export async function initializeDatabase() {
+    const db = await getDBConnection();
+    await db.execAsync(
     `
-      PRAGMA foreign_keys = ON;
-
       CREATE TABLE IF NOT EXISTS sections (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL
@@ -13,11 +16,35 @@ export async function initializeDatabase(database: SQLiteDatabase) {
       CREATE TABLE IF NOT EXISTS items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        value INTEGER NOT NULL
+        value INTEGER NOT NULL,
         measure TEXT NOT NULL,
         section INTEGER NOT NULL,
         FOREIGN KEY(section) REFERENCES sections(id)
       );
     `
   );
+}
+
+export async function setSection(name: string) {
+    const db = await getDBConnection();
+    await db.runAsync(
+        `INSERT INTO sections (name) VALUES (?);`,
+        [name]
+    );
+}
+
+export async function getSection() {
+    const db = await getDBConnection();
+    const result = await db.runAsync(
+        `SELECT * FROM sections`
+    );
+    return result;
+}
+
+export async function getAllSection() {
+    const db = await getDBConnection();
+    const result = await db.getAllAsync(
+        `SELECT * FROM sections`
+    );
+    return result;
 }
