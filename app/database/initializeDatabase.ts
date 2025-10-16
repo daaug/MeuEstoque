@@ -4,47 +4,100 @@ export const getDBConnection = async (): Promise<SQLiteDatabase> => {
     return await openDatabaseAsync('MeuEstoque.db');
 };
 
-export async function initializeDatabase() {
-    const db = await getDBConnection();
-    await db.execAsync(
-    `
-      CREATE TABLE IF NOT EXISTS sections (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
-      );
+export default class Database {
+    static async initializeDatabase() {
+        try {
+            const db = await getDBConnection();
+            await db.execAsync(
+                `
+                CREATE TABLE IF NOT EXISTS sections (
+                    sectionId INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL
+                );
 
-      CREATE TABLE IF NOT EXISTS items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        value INTEGER NOT NULL,
-        measure TEXT NOT NULL,
-        section INTEGER NOT NULL,
-        FOREIGN KEY(section) REFERENCES sections(id)
-      );
-    `
-  );
+                CREATE TABLE IF NOT EXISTS items (
+                    itemId INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    value INTEGER NOT NULL,
+                    measure TEXT NOT NULL,
+                    sectionId INTEGER NOT NULL,
+                    FOREIGN KEY (sectionId) REFERENCES sections(sectionId)
+                );
+                `
+            );
+
+        } catch(e){
+            console.error(e)
+        }
+    }
+    static async dropTables() {
+        const db = await getDBConnection();
+        await db.execAsync(
+            `
+            DROP TABLE IF EXISTS items;
+            DROP TABLE IF EXISTS sections;
+            `
+        );
+    }
+
+
+    static async setSection(name: string) {
+        const db = await getDBConnection();
+        await db.runAsync(
+            `INSERT INTO sections (name) VALUES (?);`,
+            [name]
+        );
+    }
+
+    static async getSection() {
+        const db = await getDBConnection();
+        const result = await db.runAsync(
+            `SELECT * FROM sections`
+        );
+        return result;
+    }
+
+    static async getAllSections() {
+        const db = await getDBConnection();
+        const result = await db.getAllAsync(
+            `SELECT * FROM sections`
+        );
+        return result;
+    }
+
+    static async deleteSections() {
+        const db = await getDBConnection();
+        await db.execAsync(
+            `DELETE FROM sections`
+        );
+    }
+
+    static async setItem(name: string, value: number, measure: string, sectionId: number) {
+        const db = await getDBConnection();
+        await db.runAsync(
+            `INSERT INTO items (name, value, measure, sectionId) VALUES (?, ?, ?, ?);`,
+            [name, value, measure, sectionId]
+        );
+    }
+
+    static async getItem() {
+        const db = await getDBConnection();
+        const result = await db.runAsync(
+            `SELECT * FROM items WHERE id=?`
+        );
+        return result;
+    }
+
+    static async getAllItems() {
+        const db = await getDBConnection();
+        const result = await db.runAsync(
+            `
+            SELECT * 
+                FROM items
+                INNER JOIN sections ON items.sectionId = sections.sectionId
+            `
+        );
+        return result;
+    }
 }
 
-export async function setSection(name: string) {
-    const db = await getDBConnection();
-    await db.runAsync(
-        `INSERT INTO sections (name) VALUES (?);`,
-        [name]
-    );
-}
-
-export async function getSection() {
-    const db = await getDBConnection();
-    const result = await db.runAsync(
-        `SELECT * FROM sections`
-    );
-    return result;
-}
-
-export async function getAllSection() {
-    const db = await getDBConnection();
-    const result = await db.getAllAsync(
-        `SELECT * FROM sections`
-    );
-    return result;
-}
