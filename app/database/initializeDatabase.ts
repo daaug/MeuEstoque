@@ -40,8 +40,7 @@ export default class Database {
         );
     }
 
-
-    static async setSection(name: string) {
+    static async insertSection(name: string) {
         const db = await getDBConnection();
         await db.runAsync(
             `INSERT INTO sections (name) VALUES (?);`,
@@ -53,6 +52,15 @@ export default class Database {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `SELECT * FROM sections`
+        );
+        return result;
+    }
+
+    static async getSectionByName(name: string) {
+        const db = await getDBConnection();
+        const result = await db.getFirstAsync(
+            `SELECT name FROM sections WHERE name = ?`,
+            [name]
         );
         return result;
     }
@@ -90,7 +98,7 @@ export default class Database {
 
     static async getAllItems() {
         const db = await getDBConnection();
-        const result = await db.runAsync(
+        const result = await db.getAllAsync(
             `
             SELECT * 
                 FROM items
