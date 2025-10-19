@@ -39,17 +39,23 @@ export default function NewSection({visible, closeModal}: ModalProps) {
                                 // DO NOT ALLOW a new element being created if its exact
                                 // name is already in use
                                 let result: string;
+
                                 const getSectionName = async () => {
                                     const data = await Database.getSectionByName(sectionTitle.trim());
-                                    result = data.name;
-                                }
-                                getSectionName().then(() => {
-                                    if (result !== sectionTitle.trim()) {
+                                    try {
+                                        // This is very bad, but if there is an error trying to do this,
+                                        // its because data is empty, the it falls down to add the new 
+                                        // section
+                                        result = data.name;
+                                    } catch(e){
                                         Database.insertSection(sectionTitle.trim());
                                     }
+
                                     setSectionTitle('');
                                     closeModal();
-                                });
+                                }
+
+                                getSectionName();
                             }}
                         >
                             <Text style={styles.textSave}>Salvar</Text>
