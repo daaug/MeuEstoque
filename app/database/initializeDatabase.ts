@@ -80,7 +80,7 @@ export default class Database {
         );
     }
 
-    static async setItem(name: string, value: number, measure: string, sectionId: number) {
+    static async insertItem(name: string, value: number, measure: string, sectionId: number) {
         const db = await getDBConnection();
         await db.runAsync(
             `INSERT INTO items (name, value, measure, sectionId) VALUES (?, ?, ?, ?);`,
@@ -96,13 +96,43 @@ export default class Database {
         return result;
     }
 
+    static async getItemByName(name: string, sectionId: number) {
+        const db = await getDBConnection();
+        const result = await db.getFirstAsync(
+            `SELECT * FROM sections WHERE name = ? AND sectionId = ?`,
+            [name, sectionId]
+        );
+        return result;
+    }
+
+    static async updateItem(itemId: number, name: string, value: number, measure: string) {
+        const db = await getDBConnection();
+        const result = await db.runAsync(
+            `UPDATE items
+                SET name = ?,
+                    value = ?,
+                    measure = ?
+                WHERE itemId = ?
+            `,
+            [name, value, measure, itemId]
+        );
+        return result;
+    }
+
+    static async getItemsFromSection(sectionId: number) {
+        const db = await getDBConnection();
+        const result = await db.getFirstAsync(
+            `SELECT name FROM sections WHERE sectionId = ?`,
+            [sectionId]
+        );
+        return result;
+    }
+
     static async getAllItems() {
         const db = await getDBConnection();
         const result = await db.getAllAsync(
             `
-            SELECT * 
-                FROM items
-                INNER JOIN sections ON items.sectionId = sections.sectionId
+            SELECT * FROM items
             `
         );
         return result;

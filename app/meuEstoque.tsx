@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Text, View, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Platform } from 'react-native';
 import NewSection from './modal/newSection';
 import Database from './database/initializeDatabase';
+import NewItem from './modal/newItem';
 
 
 
@@ -12,21 +13,32 @@ export default function MeuEstoque() {
     const [isSectionModalVisible, setIsSectionModalVisible] = useState(false);
     const openSectionModal = () => setIsSectionModalVisible(true);
     const closeSectionModal = () => setIsSectionModalVisible(false);
+    const [isItemModalVisible, setIsItemModalVisible] = useState(false);
+    const openItemModal = () => setIsItemModalVisible(true);
+    const closeItemModal = () => setIsItemModalVisible(false);
+
+    const [currSectionId, setCurrSectionId] = useState('');
+    const [currItemId, setCurrItemId] = useState('');
+    const [currItemName, setCurrItemName] = useState('');
+    const [currItemValue, setCurrItemValue] = useState('');
+    const [currItemMeasure, setCurrItemMeasure] = useState('');
+
     const [sectionsData, setSectionsData] = useState<any[]>([]);
+    const [itemsData, setItemsData] = useState<any[]>([]);
+
+    const loadItems = async () => {
+        const loadedItemsData = await Database.getAllItems();
+        setItemsData(loadedItemsData);
+    }
+
+    const loadSections = async () => {
+        const loadedSectionsData = await Database.getAllSections();
+        setSectionsData(loadedSectionsData);
+    }
 
     useEffect(() => {
-        const loadSections = async () => {
-            const data = await Database.getAllSections();
-            setSectionsData(data);
-        }
         loadSections();
-
-        const loadItems = async () => {
-            const data = await Database.getAllItems();
-            setSectionsData(data);
-        }
         loadItems();
-
     }, []);
 
     return (
@@ -37,28 +49,67 @@ export default function MeuEstoque() {
                     {
                         sectionsData.map((section) => (
                             <View key={section.sectionId} style={styles.sectionCard}>
-                                <Text style={styles.cardTitle}>{section.name}</Text>
-                                <TouchableOpacity onPress={
-                                    () => {
-                                        console.log(section.name)
-                                    }
-                                }>
-                                    <MaterialIcons name='edit' style={styles.cardTitle}/>
+
+                                <View style={styles.cardBox}>
+                                    <Text style={styles.cardTitle}>{section.name}</Text>
+                                    <TouchableOpacity onPress={() => { console.log(section.name) }}>
+                                        <MaterialIcons name='edit' style={styles.cardTitle}/>
+                                    </TouchableOpacity>
+                                </View>
+
+                                {
+                                    itemsData.map((item) => (
+                                        item.sectionId === section.sectionId ?
+                                            <View key={item.itemId} style={styles.itemBox}>
+                                                <Text style={styles.itemText}>{item.name}</Text>
+                                                <View style={styles.itemMeasureBox}>
+                                                    <Text style={styles.itemText}>{item.value}{item.measure}</Text>
+                                                    <TouchableOpacity onPress={() => { 
+                                                        setCurrSectionId(item.sectionId)
+                                                        setCurrItemId(item.itemId)
+                                                        setCurrItemName(item.name)
+                                                        setCurrItemValue(item.value.toString())
+                                                        setCurrItemMeasure(item.measure)
+                                                        openItemModal();
+                                                    }}>
+                                                        <MaterialIcons name='edit' style={styles.itemText}/>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </View> : null
+                                    ))
+                                }
+
+                                <TouchableOpacity style={styles.newItemBtn} onPress={() => {
+                                    setCurrSectionId(section.sectionId)
+                                    openItemModal();
+                                }} >
+                                    <Text>Novo Item</Text>
+                                    <MaterialIcons name="add" size={30} color="#007AFF" />
                                 </TouchableOpacity>
                             </View>
                         ))
                     }
-
                 </View>
             </ScrollView>
 
-            <NewSection visible={isSectionModalVisible} closeModal={closeSectionModal} />
+            <NewSection visible={isSectionModalVisible} 
+                closeModal={closeSectionModal}
+                reloadSections={loadSections}
+            />
+
+            <NewItem visible={isItemModalVisible} 
+                closeModal={closeItemModal}
+                reloadItems={loadItems}
+                reloadSections={loadSections}
+                sectionId={currSectionId}
+                id={currItemId}
+                name={currItemName}
+                value={currItemValue}
+                measure={currItemMeasure}
+            />
 
             <View style={styles.bottomBar}>
-                <TouchableOpacity 
-                style={styles.newSectionBtn}
-                onPress={openSectionModal}
-                >
+                <TouchableOpacity style={styles.newSectionBtn} onPress={openSectionModal}>
                     <MaterialIcons name="add" size={30} color="#007AFF" />
                     <Text>Cadastrar Nova Seção</Text>
                 </TouchableOpacity>
@@ -92,19 +143,42 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
     },
     sectionCard: {
-        //backgroundColor: 'red',
-        borderBottomWidth: 2,
-        borderColor: "#cacaca",
         flex: 1,
+        flexDirection: 'column',
+        width: '90%',
+    },
+    cardBox: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingBlock: 5,
         paddingInline: 20,
-        width: '90%',
+        borderBottomWidth: 2,
+        borderColor: "#cacaca",
     },
     cardTitle: {
         fontWeight: 'bold',
-        fontSize: 22,
-    }
+        fontSize: 24,
+    },
+    itemBox: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingBlock: 5,
+        paddingInline: 20,
+    },
+    itemText: {
+        fontSize: 20,
+    },
+    itemMeasureBox: {
+        flexDirection: 'row',
+        gap: 15,
+    },
+    newItemBtn: {
+        flexDirection: 'row',
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#eaeaea',
+        paddingVertical: 10,
+    },
 });
 
