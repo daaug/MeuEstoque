@@ -30,6 +30,7 @@ export default class Database {
             console.error(e)
         }
     }
+
     static async dropTables() {
         const db = await getDBConnection();
         await db.execAsync(
@@ -56,6 +57,18 @@ export default class Database {
         return result;
     }
 
+    static async updateSection(sectionId: number, name: string) {
+        const db = await getDBConnection();
+        const result = await db.runAsync(
+            `UPDATE sections
+                SET name = ?,
+                WHERE sectionId = ?
+            `,
+            [name, sectionId]
+        );
+        return result;
+    }
+
     static async getSectionByName(name: string) {
         const db = await getDBConnection();
         const result = await db.getFirstAsync(
@@ -73,10 +86,15 @@ export default class Database {
         return result;
     }
 
-    static async deleteSections() {
+    static async deleteSection(sectionId: number) {
+        await this.deleteAllItemsFromSection(sectionId);
         const db = await getDBConnection();
-        await db.execAsync(
-            `DELETE FROM sections`
+        await db.runAsync(
+            `
+            DELETE FROM sections
+                WHERE sectionId = ?;
+            `,
+            [sectionId]
         );
     }
 
@@ -134,6 +152,30 @@ export default class Database {
             `
             SELECT * FROM items
             `
+        );
+        return result;
+    }
+
+    static async deleteItem(itemId: number) {
+        const db = await getDBConnection();
+        const result = await db.runAsync(
+            `
+                DELETE FROM items
+                    WHERE itemId = ?
+            `,
+            [itemId]
+        );
+        return result;
+    }
+
+    static async deleteAllItemsFromSection(sectionId: number) {
+        const db = await getDBConnection();
+        const result = await db.runAsync(
+            `
+                DELETE FROM items
+                    WHERE sectionId = ?
+            `,
+            [sectionId]
         );
         return result;
     }

@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Text, View, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Platform } from 'react-native';
 import NewSection from './modal/newSection';
+import DeleteElement from './modal/deleteElement';
 import Database from './database/initializeDatabase';
 import NewItem from './modal/newItem';
 
@@ -11,8 +12,15 @@ export default function MeuEstoque() {
 
     const [isSectionModalVisible, setIsSectionModalVisible] = useState(false);
     const openSectionModal = () => setIsSectionModalVisible(true);
-    const closeSectionModal = () => setIsSectionModalVisible(false);
+    const closeSectionModal = () => {
+        setIsSectionModalVisible(false);
+        setCurrSectionId('');
+        setCurrSectionName('');
+    }
+    const [currSectionId, setCurrSectionId] = useState('');
+    const [currSectionName, setCurrSectionName] = useState('');
     const [isItemModalVisible, setIsItemModalVisible] = useState(false);
+
     const openItemModal = () => setIsItemModalVisible(true);
     const closeItemModal = () => {
       setIsItemModalVisible(false);
@@ -21,14 +29,25 @@ export default function MeuEstoque() {
       setCurrItemValue('');
       setCurrItemMeasure('');
     }
-
-    const [currSectionId, setCurrSectionId] = useState('');
     const [currItemId, setCurrItemId] = useState('');
     const [currItemName, setCurrItemName] = useState('');
     const [currItemValue, setCurrItemValue] = useState('');
     const [currItemMeasure, setCurrItemMeasure] = useState('');
-    const [isNew, setIsNew] = useState(true);
 
+    // For Deletion Modal usage on both sections and items deletion
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const openDeleteModal = () => setIsDeleteModalVisible(true);
+    const closeDeleteModal = () => {
+        setIsDeleteModalVisible(false);
+        setCurrElementId('');
+        setCurrElementName('');
+        setCurrElementType('');
+    }
+    const [currElementName, setCurrElementName] = useState('');
+    const [currElementId, setCurrElementId] = useState('');
+    const [currType, setCurrElementType] = useState('');
+
+    const [isNew, setIsNew] = useState(true);
     const [sectionsData, setSectionsData] = useState<any[]>([]);
     const [itemsData, setItemsData] = useState<any[]>([]);
 
@@ -43,12 +62,14 @@ export default function MeuEstoque() {
     }
 
     useEffect(() => {
-          (async () => {
-            await Database.initializeDatabase();
-            await loadSections();
-            await loadItems();
-          })();
-
+        Database.initializeDatabase();
+        loadSections();
+        loadItems();
+      //(async () => {
+      //  await Database.initializeDatabase();
+      //  await loadSections();
+      //  await loadItems();
+      //})();
     }, []);
 
     return (
@@ -60,18 +81,33 @@ export default function MeuEstoque() {
                         sectionsData.map((section) => (
                             <View key={section.sectionId} style={styles.sectionCard}>
 
-                                <View style={styles.cardBox}>
+                                <TouchableOpacity style={styles.cardBox} onLongPress={() => {
+                                    setCurrElementName(section.name);
+                                    setCurrElementId(section.sectionId);
+                                    setCurrElementType('section');
+                                    openDeleteModal();
+                                }}>
                                     <Text style={styles.cardTitle}>{section.name}</Text>
-                                    <TouchableOpacity onPress={() => { console.log(section.name) }}>
+                                    <TouchableOpacity onPress={() => { 
+                                        setCurrSectionId(section.sectionId)
+                                        setCurrSectionName(section.name)
+                                        setIsNew(false)
+                                        openSectionModal();
+                                    }}>
                                         <MaterialIcons name='edit' style={styles.cardTitle}/>
                                     </TouchableOpacity>
-                                </View>
+                                </TouchableOpacity>
 
                                 {
                                     itemsData.map((item) => (
                                         item.sectionId === section.sectionId ?
                                             <TouchableOpacity key={item.itemId} style={styles.itemBox}
-                                                onLongPress={() => { console.log("Item to be deleted: ", item.itemId) }}
+                                                onLongPress={() => { 
+                                                    setCurrElementName(item.name);
+                                                    setCurrElementId(item.itemId);
+                                                    setCurrElementType('item');
+                                                    openDeleteModal();
+                                                }}
                                             >
                                                 <Text style={styles.itemText}>{item.name}</Text>
                                                 <View style={styles.itemMeasureBox}>
@@ -115,6 +151,9 @@ export default function MeuEstoque() {
             <NewSection visible={isSectionModalVisible} 
                 closeModal={closeSectionModal}
                 reloadSections={loadSections}
+                id={currSectionId}
+                name={currSectionName}
+                isNew={isNew}
             />
 
             <NewItem visible={isItemModalVisible} 
@@ -128,16 +167,30 @@ export default function MeuEstoque() {
                 measure={currItemMeasure}
                 isNew={isNew}
             />
+            
+            <DeleteElement visible={isDeleteModalVisible}
+                reloadSections={loadSections}
+                reloadItems={loadItems}
+                closeModal={closeDeleteModal}
+                id={currElementId}
+                name={currElementName}
+                type={currType}
+            />
 
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.newSectionBtn} onPress={openSectionModal}>
+                <TouchableOpacity style={styles.newSectionBtn} onPress={() => {
+                    setCurrSectionId('');
+                    setCurrSectionName('');
+                    setIsNew(true);
+                    openSectionModal();
+                }}>
                     <MaterialIcons name="add" size={30} color="#007AFF" />
                     <Text>Cadastrar Nova Seção</Text>
                 </TouchableOpacity>
             </View>
         </View>
     );
-    }
+}
 
 const styles = StyleSheet.create({
     container: {
