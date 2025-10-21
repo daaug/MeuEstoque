@@ -31,7 +31,7 @@ export default function NewSection({visible, closeModal, reloadSections, name, i
                     <View>
                         <Text style={styles.campoTitulo}>Nome da nova Seção:</Text>
                         <TextInput style={styles.input}
-                            placeholder="Insira o nome da Nova Seção"
+                            placeholder="Insira o nome da Seção"
                             value={sectionName}
                             onChangeText={setSectionName}
                         />

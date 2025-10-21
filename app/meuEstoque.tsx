@@ -62,14 +62,14 @@ export default function MeuEstoque() {
     }
 
     useEffect(() => {
-        Database.initializeDatabase();
-        loadSections();
-        loadItems();
-      //(async () => {
-      //  await Database.initializeDatabase();
-      //  await loadSections();
-      //  await loadItems();
-      //})();
+      //  Database.initializeDatabase();
+      //  loadSections();
+      //  loadItems();
+      (async () => {
+        await Database.initializeDatabase();
+        await loadSections();
+        await loadItems();
+      })();
     }, []);
 
     return (

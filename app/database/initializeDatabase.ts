@@ -44,7 +44,10 @@ export default class Database {
     static async insertSection(name: string) {
         const db = await getDBConnection();
         await db.runAsync(
-            `INSERT INTO sections (name) VALUES (?);`,
+            `
+            INSERT INTO sections (name) 
+                VALUES (?);
+            `,
             [name]
         );
     }
@@ -60,8 +63,9 @@ export default class Database {
     static async updateSection(sectionId: number, name: string) {
         const db = await getDBConnection();
         const result = await db.runAsync(
-            `UPDATE sections
-                SET name = ?,
+            `
+            UPDATE sections
+                SET name = ?
                 WHERE sectionId = ?
             `,
             [name, sectionId]
@@ -72,7 +76,11 @@ export default class Database {
     static async getSectionByName(name: string) {
         const db = await getDBConnection();
         const result = await db.getFirstAsync(
-            `SELECT name FROM sections WHERE name = ?`,
+            `
+            SELECT name 
+                FROM sections 
+                WHERE name = ?
+            `,
             [name]
         );
         return result;
@@ -101,7 +109,10 @@ export default class Database {
     static async insertItem(name: string, value: number, measure: string, sectionId: number) {
         const db = await getDBConnection();
         await db.runAsync(
-            `INSERT INTO items (name, value, measure, sectionId) VALUES (?, ?, ?, ?);`,
+            `
+            INSERT INTO items (name, value, measure, sectionId) 
+                VALUES (?, ?, ?, ?);
+            `,
             [name, value, measure, sectionId]
         );
     }
@@ -109,7 +120,10 @@ export default class Database {
     static async getItem() {
         const db = await getDBConnection();
         const result = await db.runAsync(
-            `SELECT * FROM items WHERE id=?`
+            `
+            SELECT * FROM items 
+                WHERE id=?
+            `
         );
         return result;
     }
@@ -117,7 +131,10 @@ export default class Database {
     static async getItemByName(name: string, sectionId: number) {
         const db = await getDBConnection();
         const result = await db.getFirstAsync(
-            `SELECT * FROM sections WHERE name = ? AND sectionId = ?`,
+            `
+            SELECT * FROM sections 
+                WHERE name = ? AND sectionId = ?
+            `,
             [name, sectionId]
         );
         return result;
@@ -140,7 +157,10 @@ export default class Database {
     static async getItemsFromSection(sectionId: number) {
         const db = await getDBConnection();
         const result = await db.getFirstAsync(
-            `SELECT name FROM sections WHERE sectionId = ?`,
+            `
+            SELECT name FROM sections 
+                WHERE sectionId = ?
+            `,
             [sectionId]
         );
         return result;
