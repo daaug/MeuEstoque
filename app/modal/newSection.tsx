@@ -1,14 +1,25 @@
-import { useState } from "react";
-import { Modal, View, Text, StyleSheet, Button, TextInput, TouchableOpacity } from "react-native";
+import { useEffect, useState } from "react";
+import { Modal, View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import Database from "../database/initializeDatabase";
 
 interface ModalProps {
     visible: boolean;
     closeModal: () => void;
+    reloadSections: () => void;
+    name: string;
+    id: string;
+    isNew: boolean;
 }
 
-export default function NewSection({visible, closeModal}: ModalProps) {
-    const [sectionTitle, setSectionTitle] = useState('');
+export default function NewSection({visible, closeModal, reloadSections, name, id, isNew}: ModalProps) {
+    const [sectionName, setSectionName] = useState(name);
+    const [sectionId, setSectionId] = useState(id);
+
+    useEffect(() => {
+        setSectionName(name)
+        setSectionId(id)
+    }, [name, id]);
+
     return (
         <Modal 
             visible={visible}
@@ -21,14 +32,13 @@ export default function NewSection({visible, closeModal}: ModalProps) {
                         <Text style={styles.campoTitulo}>Nome da nova Seção:</Text>
                         <TextInput style={styles.input}
                             placeholder="Insira o nome da Nova Seção"
-                            value={sectionTitle}
-                            onChangeText={setSectionTitle}
+                            value={sectionName}
+                            onChangeText={setSectionName}
                         />
                     </View>
 
                     <View style={styles.buttons}>
                         <TouchableOpacity style={styles.btnCancel} onPress={() => {
-                            setSectionTitle('');
                             closeModal();
                         }}>
                             <Text style={styles.textCancel}>Cancelar</Text>
@@ -36,26 +46,21 @@ export default function NewSection({visible, closeModal}: ModalProps) {
 
                         <TouchableOpacity style={styles.btnSave}
                             onPress={() => {
-                                // DO NOT ALLOW a new element being created if its exact
-                                // name is already in use
-                                let result: string;
-
-                                const getSectionName = async () => {
-                                    const data = await Database.getSectionByName(sectionTitle.trim());
-                                    try {
-                                        // This is very bad, but if there is an error trying to do this,
-                                        // its because data is empty, the it falls down to add the new 
-                                        // section
-                                        result = data.name;
-                                    } catch(e){
-                                        Database.insertSection(sectionTitle.trim());
+                                const updateOrInsertSection = () => {
+                                    if (isNew){
+                                        Database.insertSection(sectionName).then(() => {
+                                            reloadSections();
+                                            closeModal();
+                                        });
+                                    } else {
+                                        Database.updateSection(parseInt(sectionId), sectionName).then(() => {
+                                            reloadSections();
+                                            closeModal();
+                                        });
                                     }
-
-                                    setSectionTitle('');
-                                    closeModal();
                                 }
 
-                                getSectionName();
+                                updateOrInsertSection();
                             }}
                         >
                             <Text style={styles.textSave}>Salvar</Text>

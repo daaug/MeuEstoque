@@ -85,7 +85,6 @@ export default function NewItem({visible, closeModal, reloadItems, reloadSection
 
                     <View style={styles.buttons}>
                         <TouchableOpacity style={styles.btnCancel} onPress={() => {
-                            reloadItems();
                             closeModal();
                         }}>
                             <Text style={styles.textCancel}>Cancelar</Text>
@@ -93,7 +92,7 @@ export default function NewItem({visible, closeModal, reloadItems, reloadSection
 
                         <TouchableOpacity style={styles.btnSave}
                             onPress={() => {
-                                const updateOrInsertItem = async () => {
+                                const updateOrInsertItem = () => {
                                     if (isNew){
                                         Database.insertItem(itemName, parseInt(itemValue) || 0, radioButtonSelected, parseInt(sectionId)).then(() => {
                                             reloadItems();
