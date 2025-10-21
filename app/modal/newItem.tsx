@@ -13,9 +13,11 @@ interface ModalProps {
     value: string;
     measure: string;
     sectionId: string;
+    isNew: boolean;
 }
 
-export default function NewItem({visible, closeModal, reloadItems, reloadSections, id, name, value, measure, sectionId}: ModalProps) {
+export default function NewItem({visible, closeModal, reloadItems, reloadSections, id, name, value, measure, sectionId, isNew}: ModalProps) {
+
     const [itemName, setItemName] = useState(name);
     const [itemValue, setItemValue] = useState(value);
     const [itemId, setItemId] = useState(id);
@@ -26,7 +28,7 @@ export default function NewItem({visible, closeModal, reloadItems, reloadSection
         setItemName(name);
         setItemValue(value);
         setRadioButtonSelected(measure);
-    }, [id, name, value, measure]);
+    }, [id, name, value, measure, sectionId]);
 
     return (
         <Modal 
@@ -83,8 +85,7 @@ export default function NewItem({visible, closeModal, reloadItems, reloadSection
 
                     <View style={styles.buttons}>
                         <TouchableOpacity style={styles.btnCancel} onPress={() => {
-                            setItemName('');
-                            setItemValue('');
+                            reloadItems();
                             closeModal();
                         }}>
                             <Text style={styles.textCancel}>Cancelar</Text>
@@ -93,15 +94,17 @@ export default function NewItem({visible, closeModal, reloadItems, reloadSection
                         <TouchableOpacity style={styles.btnSave}
                             onPress={() => {
                                 const updateOrInsertItem = async () => {
-                                    try {
-                                        Database.updateItem(parseInt(itemId), itemName, parseInt(itemValue), radioButtonSelected);
-                                    } catch(e){
-                                        Database.insertItem(itemName, parseInt(itemValue), radioButtonSelected, parseInt(sectionId));
+                                    if (isNew){
+                                        Database.insertItem(itemName, parseInt(itemValue) || 0, radioButtonSelected, parseInt(sectionId)).then(() => {
+                                            reloadItems();
+                                            closeModal();
+                                        });
+                                    } else {
+                                        Database.updateItem(parseInt(itemId), itemName, parseInt(itemValue) || 0, radioButtonSelected).then(() => {
+                                            reloadItems();
+                                            closeModal();
+                                        });
                                     }
-                                    reloadItems();
-                                    setItemName('');
-                                    setItemValue('');
-                                    closeModal();
                                 }
 
                                 updateOrInsertItem();

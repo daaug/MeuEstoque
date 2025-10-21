@@ -8,20 +8,26 @@ import NewItem from './modal/newItem';
 
 
 export default function MeuEstoque() {
-    Database.initializeDatabase();
 
     const [isSectionModalVisible, setIsSectionModalVisible] = useState(false);
     const openSectionModal = () => setIsSectionModalVisible(true);
     const closeSectionModal = () => setIsSectionModalVisible(false);
     const [isItemModalVisible, setIsItemModalVisible] = useState(false);
     const openItemModal = () => setIsItemModalVisible(true);
-    const closeItemModal = () => setIsItemModalVisible(false);
+    const closeItemModal = () => {
+      setIsItemModalVisible(false);
+      setCurrItemId('');
+      setCurrItemName('');
+      setCurrItemValue('');
+      setCurrItemMeasure('');
+    }
 
     const [currSectionId, setCurrSectionId] = useState('');
     const [currItemId, setCurrItemId] = useState('');
     const [currItemName, setCurrItemName] = useState('');
     const [currItemValue, setCurrItemValue] = useState('');
     const [currItemMeasure, setCurrItemMeasure] = useState('');
+    const [isNew, setIsNew] = useState(true);
 
     const [sectionsData, setSectionsData] = useState<any[]>([]);
     const [itemsData, setItemsData] = useState<any[]>([]);
@@ -37,8 +43,12 @@ export default function MeuEstoque() {
     }
 
     useEffect(() => {
-        loadSections();
-        loadItems();
+          (async () => {
+            await Database.initializeDatabase();
+            await loadSections();
+            await loadItems();
+          })();
+
     }, []);
 
     return (
@@ -60,26 +70,36 @@ export default function MeuEstoque() {
                                 {
                                     itemsData.map((item) => (
                                         item.sectionId === section.sectionId ?
-                                            <View key={item.itemId} style={styles.itemBox}>
+                                            <TouchableOpacity key={item.itemId} style={styles.itemBox}
+                                                onLongPress={() => { console.log("Item to be deleted: ", item.itemId) }}
+                                            >
                                                 <Text style={styles.itemText}>{item.name}</Text>
                                                 <View style={styles.itemMeasureBox}>
                                                     <Text style={styles.itemText}>{item.value}{item.measure}</Text>
-                                                    <TouchableOpacity onPress={() => { 
-                                                        setCurrSectionId(item.sectionId)
-                                                        setCurrItemId(item.itemId)
-                                                        setCurrItemName(item.name)
-                                                        setCurrItemValue(item.value.toString())
-                                                        setCurrItemMeasure(item.measure)
-                                                        openItemModal();
-                                                    }}>
+                                                    <TouchableOpacity 
+                                                        onPress={() => { 
+                                                            setCurrSectionId(item.sectionId)
+                                                            setCurrItemId(item.itemId)
+                                                            setCurrItemName(item.name)
+                                                            setCurrItemValue(item.value.toString())
+                                                            setCurrItemMeasure(item.measure)
+                                                            setIsNew(false)
+                                                            openItemModal();
+                                                        }}
+                                                    >
                                                         <MaterialIcons name='edit' style={styles.itemText}/>
                                                     </TouchableOpacity>
                                                 </View>
-                                            </View> : null
+                                            </TouchableOpacity> : null
                                     ))
                                 }
 
                                 <TouchableOpacity style={styles.newItemBtn} onPress={() => {
+                                    setCurrItemId('');
+                                    setCurrItemName('');
+                                    setCurrItemValue('');
+                                    setCurrItemMeasure('g');
+                                    setIsNew(true);
                                     setCurrSectionId(section.sectionId)
                                     openItemModal();
                                 }} >
@@ -106,6 +126,7 @@ export default function MeuEstoque() {
                 name={currItemName}
                 value={currItemValue}
                 measure={currItemMeasure}
+                isNew={isNew}
             />
 
             <View style={styles.bottomBar}>
@@ -179,6 +200,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#eaeaea',
         paddingVertical: 10,
+        marginBottom: 20,
     },
 });
 
