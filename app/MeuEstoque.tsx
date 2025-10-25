@@ -1,10 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Text, View, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Platform } from 'react-native';
-import NewSection from './modal/newSection';
+import NewSection from './modal/Section';
 import DeleteElement from './modal/deleteElement';
-import Database from './database/initializeDatabase';
-import NewItem from './modal/newItem';
+import Database from './database/EstoqueDatabase';
+import NewItem from './modal/Item';
 
 
 
@@ -169,8 +169,8 @@ export default function MeuEstoque() {
             />
             
             <DeleteElement visible={isDeleteModalVisible}
-                reloadSections={loadSections}
-                reloadItems={loadItems}
+                reloadParents={loadSections}
+                reloadChildren={loadItems}
                 closeModal={closeDeleteModal}
                 id={currElementId}
                 name={currElementName}

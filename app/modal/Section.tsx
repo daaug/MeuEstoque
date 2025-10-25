@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import Database from "../database/initializeDatabase";
+import Database from "../database/EstoqueDatabase";
 
 interface ModalProps {
     visible: boolean;

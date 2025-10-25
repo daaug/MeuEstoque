@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
-import Database from "../database/initializeDatabase";
+import Database from "../database/EstoqueDatabase";
 
 interface ModalProps {
     visible: boolean;
