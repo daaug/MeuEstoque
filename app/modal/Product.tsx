@@ -5,23 +5,25 @@ import Database from "../database/EstoqueDatabase";
 interface ModalProps {
     visible: boolean;
     closeModal: () => void;
-    reloadParents: () => void;
-    reloadChildren: () => void;
+    reloadProducts: () => void;
     id: string;
+    clientId: string;
     name: string;
-    type: string;
+    isNew: boolean;
 }
 
-export default function DeleteElement({visible, closeModal, reloadParents, reloadChildren, name, id, type}: ModalProps) {
-    const [elementName, setElementName] = useState(name);
-    const [elementId, setElementId] = useState(id);
-    const [elementType, setElementType] = useState(type);
+export default function NewProduct({visible, closeModal, reloadProducts, id, clientId, name, isNew}: ModalProps) {
+
+    const [productClientId, setProductClientId] = useState(clientId);
+    const [productId, setProductId] = useState(id);
+    const [productName, setProductName] = useState(name);
 
     useEffect(() => {
-        setElementName(name)
-        setElementId(id)
-        setElementType(type)
-    }, [name, id, type]);
+        setProductClientId(clientId);
+        setProductId(id);
+        setProductName(name);
+    }, [clientId, id, name]);
+	console.log(productClientId);
 
     return (
         <Modal 
@@ -31,9 +33,13 @@ export default function DeleteElement({visible, closeModal, reloadParents, reloa
         >
             <View style={styles.viewContainer}>
                 <View style={styles.viewElements}>
-                    <View style={styles.boxTitulo}>
-                        <Text style={styles.campoTitulo}>Tem certeza que deseja remover:</Text>
-                        <Text style={styles.campoTitulo}>{elementName}</Text>
+                    <View>
+                        <Text style={styles.campoTitulo}>Nome do Produto:</Text>
+                        <TextInput style={styles.input}
+                            placeholder="Insira o nome do produto"
+                            value={productName}
+                            onChangeText={setProductName}
+                        />
                     </View>
 
                     <View style={styles.buttons}>
@@ -43,28 +49,26 @@ export default function DeleteElement({visible, closeModal, reloadParents, reloa
                             <Text style={styles.textCancel}>Cancelar</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.btnDeletar}
+                        <TouchableOpacity style={styles.btnSave}
                             onPress={() => {
-                                const deleteElement = async () => {
-                                    if (elementType === 'section'){
-                                        Database.deleteSection(parseInt(elementId)).then(() => {
-                                            reloadChildren();
-                                            reloadParents();
+                                const updateOrInsertProduct = () => {
+                                    if (isNew){
+                                        Database.insertProduct(productName, parseInt(productClientId)).then(() => {
+                                            reloadProducts();
                                             closeModal();
                                         });
-                                    } else if (elementType === 'item'){
-                                        Database.deleteItem(parseInt(elementId)).then(() => {
-                                            reloadChildren();
-                                            reloadParents();
+                                    } else {
+                                        Database.updateProduct(parseInt(productId), productName).then(() => {
+                                            reloadProducts();
                                             closeModal();
                                         });
                                     }
                                 }
 
-                                deleteElement();
+                                updateOrInsertProduct();
                             }}
                         >
-                            <Text style={styles.textDeletar}>Deletar</Text>
+                            <Text style={styles.textSave}>Salvar</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -91,9 +95,6 @@ const styles = StyleSheet.create({
         padding: 5,
         width: '95%',
     },
-    boxTitulo: {
-        flexDirection: 'column',
-    },
     buttons: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -101,14 +102,14 @@ const styles = StyleSheet.create({
     btnCancel: {
         backgroundColor: 'none',
         borderWidth: 2,
-        borderColor: 'black',
+        borderColor: 'red',
         padding: 5,
     },
-    btnDeletar: {
+    btnSave: {
         backgroundColor: 'none',
         color: 'black',
         borderWidth: 2,
-        borderColor: 'red',
+        borderColor: 'black',
         padding: 5,
     },
     textCancel: {
@@ -116,13 +117,23 @@ const styles = StyleSheet.create({
         fontSize: 22,
         color: 'black',
     },
-    textDeletar: {
+    textSave: {
         fontWeight: 'bold',
         fontSize: 22,
-        color: 'red',
+        color: 'black',
     },
     campoTitulo: {
         fontWeight: 'bold',
         fontSize: 22,
     },
+    input: {
+        borderColor: '#000000',
+        borderWidth: 1,
+        borderRadius: 10,
+        fontSize: 22,
+    },
+    radioBox: {
+        flexDirection: 'row',
+        gap: 20,
+    }
 });

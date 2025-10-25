@@ -5,23 +5,20 @@ import Database from "../database/EstoqueDatabase";
 interface ModalProps {
     visible: boolean;
     closeModal: () => void;
-    reloadParents: () => void;
-    reloadChildren: () => void;
-    id: string;
+    reloadClients: () => void;
     name: string;
-    type: string;
+    id: string;
+    isNew: boolean;
 }
 
-export default function DeleteElement({visible, closeModal, reloadParents, reloadChildren, name, id, type}: ModalProps) {
-    const [elementName, setElementName] = useState(name);
-    const [elementId, setElementId] = useState(id);
-    const [elementType, setElementType] = useState(type);
+export default function NewClient({visible, closeModal, reloadClients, name, id, isNew}: ModalProps) {
+    const [clientName, setClientName] = useState(name);
+    const [clientId, setClientId] = useState(id);
 
     useEffect(() => {
-        setElementName(name)
-        setElementId(id)
-        setElementType(type)
-    }, [name, id, type]);
+        setClientName(name)
+        setClientId(id)
+    }, [name, id]);
 
     return (
         <Modal 
@@ -31,9 +28,13 @@ export default function DeleteElement({visible, closeModal, reloadParents, reloa
         >
             <View style={styles.viewContainer}>
                 <View style={styles.viewElements}>
-                    <View style={styles.boxTitulo}>
-                        <Text style={styles.campoTitulo}>Tem certeza que deseja remover:</Text>
-                        <Text style={styles.campoTitulo}>{elementName}</Text>
+                    <View>
+                        <Text style={styles.campoTitulo}>Nome do Cliente:</Text>
+                        <TextInput style={styles.input}
+                            placeholder="Insira o nome do Cliente"
+                            value={clientName}
+                            onChangeText={setClientName}
+                        />
                     </View>
 
                     <View style={styles.buttons}>
@@ -43,28 +44,26 @@ export default function DeleteElement({visible, closeModal, reloadParents, reloa
                             <Text style={styles.textCancel}>Cancelar</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.btnDeletar}
+                        <TouchableOpacity style={styles.btnSave}
                             onPress={() => {
-                                const deleteElement = async () => {
-                                    if (elementType === 'section'){
-                                        Database.deleteSection(parseInt(elementId)).then(() => {
-                                            reloadChildren();
-                                            reloadParents();
+                                const updateOrInsertClient = () => {
+                                    if (isNew){
+                                        Database.insertClient(clientName).then(() => {
+                                            reloadClients();
                                             closeModal();
                                         });
-                                    } else if (elementType === 'item'){
-                                        Database.deleteItem(parseInt(elementId)).then(() => {
-                                            reloadChildren();
-                                            reloadParents();
+                                    } else {
+                                        Database.updateClient(parseInt(clientId), clientName).then(() => {
+                                            reloadClients();
                                             closeModal();
                                         });
                                     }
                                 }
 
-                                deleteElement();
+                                updateOrInsertClient();
                             }}
                         >
-                            <Text style={styles.textDeletar}>Deletar</Text>
+                            <Text style={styles.textSave}>Salvar</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -91,9 +90,6 @@ const styles = StyleSheet.create({
         padding: 5,
         width: '95%',
     },
-    boxTitulo: {
-        flexDirection: 'column',
-    },
     buttons: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -101,14 +97,14 @@ const styles = StyleSheet.create({
     btnCancel: {
         backgroundColor: 'none',
         borderWidth: 2,
-        borderColor: 'black',
+        borderColor: 'red',
         padding: 5,
     },
-    btnDeletar: {
+    btnSave: {
         backgroundColor: 'none',
         color: 'black',
         borderWidth: 2,
-        borderColor: 'red',
+        borderColor: 'black',
         padding: 5,
     },
     textCancel: {
@@ -116,13 +112,18 @@ const styles = StyleSheet.create({
         fontSize: 22,
         color: 'black',
     },
-    textDeletar: {
+    textSave: {
         fontWeight: 'bold',
         fontSize: 22,
-        color: 'red',
+        color: 'black',
     },
     campoTitulo: {
         fontWeight: 'bold',
+        fontSize: 22,
+    },
+    input: {
+        borderColor: '#000000',
+        borderWidth: 1,
         fontSize: 22,
     },
 });
