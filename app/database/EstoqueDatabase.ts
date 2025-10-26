@@ -39,7 +39,7 @@ export default class Database {
                     saleId INTEGER PRIMARY KEY AUTOINCREMENT,
                     clientId INTEGER NOT NULL,
                     productId INTEGER NOT NULL,
-                    value INTEGER NOT NULL,
+                    value REAL NOT NULL,
                     date TEXT NOT NULL
                 );
                 `
@@ -202,7 +202,7 @@ export default class Database {
         );
         return result;
     }
-    static async updateSale(clientId: string, productId: string, value: number, date: string) {
+    static async updateSale(clientId: number, productId: number, value: number, date: string) {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `
@@ -211,7 +211,7 @@ export default class Database {
                     productId = ?,
                     value = ?,
                     date = ?
-                WHERE productId = ?
+                WHERE clientId = ? AND productId = ?
             `,
             [clientId, productId, value, date]
         );

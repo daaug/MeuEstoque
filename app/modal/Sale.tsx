@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Modal, View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import { MaterialIcons } from '@expo/vector-icons';
 import Database from "../database/EstoqueDatabase";
 
 interface ModalProps {
@@ -40,47 +39,21 @@ export default function NewSale({visible, closeModal, reloadSales, id, clientId,
             <View style={styles.viewContainer}>
                 <View style={styles.viewElements}>
                     <View>
-                        <Text style={styles.campoTitulo}>Nome do Item:</Text>
+                        <Text style={styles.campoTitulo}>Valor da Venda:</Text>
                         <TextInput style={styles.input}
-                            placeholder="Insira o nome do item"
-                            value={itemName}
-                            onChangeText={setItemName}
+							inputMode="numeric"
+                            placeholder="Insira o valor da venda"
+                            value={saleValue}
+                            onChangeText={setSaleValue}
                         />
                     </View>
 
                     <View>
-                        <Text style={styles.campoTitulo}>Unidade de Medida:</Text>
-                        <TouchableOpacity
-                            style={styles.radioBox}
-                            onPress={() => {setRadioButtonSelected('g')}}
-                        >
-                            <MaterialIcons name={radioButtonSelected === 'g' ? "radio-button-on" : "radio-button-off"} size={25} color="#000000" />
-                            <Text>gramas</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.radioBox}
-                            onPress={() => {setRadioButtonSelected('L')}}
-                        >
-                            <MaterialIcons name={radioButtonSelected === 'L' ? "radio-button-on" : "radio-button-off"} size={25} color="#000000" />
-                            <Text>litros</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.radioBox}
-                            onPress={() => {setRadioButtonSelected('un')}}
-                        >
-                            <MaterialIcons name={radioButtonSelected === 'un' ? "radio-button-on" : "radio-button-off"} size={25} color="#000000" />
-                            <Text>unidades</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View>
-                        <Text style={styles.campoTitulo}>Valor da Unidade de Medida:</Text>
+                        <Text style={styles.campoTitulo}>Data da Venda (ex: dia/mes/ano):</Text>
                         <TextInput style={styles.input}
-                            keyboardType="numeric"
-                            value={itemValue}
-                            onChangeText={setItemValue}
+                            placeholder="Insira a data da venda"
+                            value={saleDate}
+                            onChangeText={setSaleDate}
                         />
                     </View>
 
@@ -95,13 +68,13 @@ export default function NewSale({visible, closeModal, reloadSales, id, clientId,
                             onPress={() => {
                                 const updateOrInsertItem = () => {
                                     if (isNew){
-                                        Database.insertItem(itemName, parseInt(itemValue) || 0, radioButtonSelected, parseInt(sectionId)).then(() => {
-                                            reloadItems();
+                                        Database.insertSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), saleDate).then(() => {
+                                            reloadSales();
                                             closeModal();
                                         });
                                     } else {
-                                        Database.updateItem(parseInt(itemId), itemName, parseInt(itemValue) || 0, radioButtonSelected).then(() => {
-                                            reloadItems();
+                                        Database.updateSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), saleDate).then(() => {
+                                            reloadSales();
                                             closeModal();
                                         });
                                     }

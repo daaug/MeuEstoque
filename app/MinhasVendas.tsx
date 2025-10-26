@@ -4,6 +4,7 @@ import { Text, View, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Platfo
 import Database from './database/EstoqueDatabase';
 import NewClient from './modal/Client';
 import NewProduct from './modal/Product';
+import NewSale from './modal/Sale';
 import DeleteElement from './modal/deleteElement';
 
 
@@ -35,7 +36,6 @@ export default function MinhasVendas() {
     const closeSaleModal = () => {
       setIsSaleModalVisible(false);
       setCurrSaleId('');
-      setCurrSaleName('');
     }
     const [currSaleId, setCurrSaleId] = useState('');
     const [currSaleValue, setCurrSaleValue] = useState('');
@@ -138,12 +138,15 @@ export default function MinhasVendas() {
 													salesData.map((sale) => (
 														sale.clientId === client.clientId && sale.productId === product.productId ?
 														<TouchableOpacity key={sale.saleId}
-															onPress={() => {
+															style={styles.saleBox}
+															onLongPress={() => {
 
 															}}
 														>
-															<Text>Vendido: {sale.date}</Text>	
-															<Text>${sale.value}</Text>	
+															<View style={styles.saleBoxDesc}>
+																<Text>Vendido: {sale.date}</Text>	
+																<Text>${sale.value}</Text>	
+															</View>
 														</TouchableOpacity> : null
 													))
 												}
@@ -152,9 +155,9 @@ export default function MinhasVendas() {
 														setCurrSaleId('');
 														setCurrSaleValue('');
 														setCurrSaleDate('');
-														setIsNew(true);
 														setCurrClientId(client.clientId)
-														setCurrProductId(client.clientId)
+														setCurrProductId(product.productId)
+														setIsNew(true);
 														openSaleModal();
 													}} >
 														<Text>Nova Venda</Text>
@@ -195,6 +198,17 @@ export default function MinhasVendas() {
 				clientId={currClientId}
                 id={currProductId}
                 name={currProductName}
+                isNew={isNew}
+            />
+
+            <NewSale visible={isSaleModalVisible} 
+                closeModal={closeSaleModal}
+				clientId={currClientId}
+				productId={currProductId}
+                id={currSaleId}
+				date={currSaleDate}
+				value={currSaleValue}
+				reloadSales={loadSales}
                 isNew={isNew}
             />
             
@@ -279,6 +293,17 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
         gap: 15,
     },
+	saleBox: {
+		width: '100%',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	saleBoxDesc: {
+		width: '85%',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		flexDirection: 'row',
+	},
     newProductBtn: {
         flexDirection: 'row',
         width: '100%',

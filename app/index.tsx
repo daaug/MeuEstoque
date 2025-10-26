@@ -5,7 +5,6 @@ import MinhasVendas from "./MinhasVendas";
 const Drawer = createDrawerNavigator();
 
 export default function Index() {
-    
 
     return (
         <Drawer.Navigator>
