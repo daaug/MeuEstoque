@@ -36,6 +36,10 @@ export default function MinhasVendas() {
     const closeSaleModal = () => {
       setIsSaleModalVisible(false);
       setCurrSaleId('');
+      setCurrSaleValue('');
+      setCurrSaleDate('');
+      setCurrProductId('');
+      setCurrClientId('');
     }
     const [currSaleId, setCurrSaleId] = useState('');
     const [currSaleValue, setCurrSaleValue] = useState('');
@@ -155,8 +159,8 @@ export default function MinhasVendas() {
 														setCurrSaleId('');
 														setCurrSaleValue('');
 														setCurrSaleDate('');
-														setCurrClientId(client.clientId)
-														setCurrProductId(product.productId)
+														setCurrClientId(client.clientId);
+														setCurrProductId(product.productId);
 														setIsNew(true);
 														openSaleModal();
 													}} >

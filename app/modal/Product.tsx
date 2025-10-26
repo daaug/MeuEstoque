@@ -23,7 +23,6 @@ export default function NewProduct({visible, closeModal, reloadProducts, id, cli
         setProductId(id);
         setProductName(name);
     }, [clientId, id, name]);
-	console.log(productClientId);
 
     return (
         <Modal 

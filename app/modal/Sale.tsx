@@ -16,18 +16,22 @@ interface ModalProps {
 
 export default function NewSale({visible, closeModal, reloadSales, id, clientId, productId, value, date, isNew}: ModalProps) {
 
-    const [saleId, setSaleId] = useState(id);
-    const [saleClientId, setSaleClientId] = useState(clientId);
-    const [saleProductId, setSaleProductId] = useState(productId);
-    const [saleValue, setSaleValue] = useState(value);
-    const [saleDate, setSaleDate] = useState(date);
+    const [saleId, setSaleId] = useState('');
+    const [saleClientId, setSaleClientId] = useState('');
+    const [saleProductId, setSaleProductId] = useState('');
+    const [saleValue, setSaleValue] = useState('');
+    const [saleDay, setSaleDay] = useState('');
+    const [saleMonth, setSaleMonth] = useState('');
+    const [saleYear, setSaleYear] = useState('');
 
     useEffect(() => {
 		setSaleId(id);
 		setSaleClientId(clientId);
 		setSaleProductId(productId);
 		setSaleValue(value);
-		setSaleDate(date);
+		setSaleDay(date.split('/')[0]);
+		setSaleMonth(date.split('/')[1]);
+		setSaleYear(date.split('/')[2]);
     }, [id, clientId, productId, value, date]);
 
     return (
@@ -41,21 +45,41 @@ export default function NewSale({visible, closeModal, reloadSales, id, clientId,
                     <View>
                         <Text style={styles.campoTitulo}>Valor da Venda:</Text>
                         <TextInput style={styles.input}
-							inputMode="numeric"
+							inputMode="decimal"
                             placeholder="Insira o valor da venda"
                             value={saleValue}
                             onChangeText={setSaleValue}
                         />
                     </View>
 
-                    <View>
-                        <Text style={styles.campoTitulo}>Data da Venda (ex: dia/mes/ano):</Text>
-                        <TextInput style={styles.input}
-                            placeholder="Insira a data da venda"
-                            value={saleDate}
-                            onChangeText={setSaleDate}
-                        />
-                    </View>
+					<Text style={styles.campoTitulo}>Data da Venda:</Text>
+					<View style={styles.dateBox}>
+						<View style={styles.dateBoxElements}>
+							<Text style={styles.campoTitulo}>dia</Text>
+							<TextInput style={styles.input}
+								value={saleDay}
+								maxLength={2}
+								onChangeText={setSaleDay}
+							/>
+						</View>
+						<View style={styles.dateBoxElements}>
+							<Text style={styles.campoTitulo}>mês</Text>
+							<TextInput style={styles.input}
+								value={saleMonth}
+								maxLength={2}
+								onChangeText={setSaleMonth}
+							/>
+						</View>
+						<View style={styles.dateBoxElements}>
+							<Text style={styles.campoTitulo}>ano</Text>
+							<TextInput style={styles.input}
+								value={saleYear}
+								maxLength={4}
+								onChangeText={setSaleYear}
+							/>
+						</View>
+
+					</View>
 
                     <View style={styles.buttons}>
                         <TouchableOpacity style={styles.btnCancel} onPress={() => {
@@ -68,12 +92,12 @@ export default function NewSale({visible, closeModal, reloadSales, id, clientId,
                             onPress={() => {
                                 const updateOrInsertItem = () => {
                                     if (isNew){
-                                        Database.insertSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), saleDate).then(() => {
+                                        Database.insertSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), `${saleDay}/${saleMonth}/${saleYear}`).then(() => {
                                             reloadSales();
                                             closeModal();
                                         });
                                     } else {
-                                        Database.updateSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), saleDate).then(() => {
+                                        Database.updateSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), `${saleDay}/${saleMonth}/${saleYear}`).then(() => {
                                             reloadSales();
                                             closeModal();
                                         });
@@ -150,5 +174,13 @@ const styles = StyleSheet.create({
     radioBox: {
         flexDirection: 'row',
         gap: 20,
-    }
+    },
+	dateBox: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		gap: 20,
+	},
+	dateBoxElements: {
+		flex: 1
+	},
 });
