@@ -63,6 +63,7 @@ export default function MinhasVendas() {
     const [productsData, setProductsData] = useState<any[]>([]);
     const [salesData, setSalesData] = useState<any[]>([]);
 
+
     const loadClients = async () => {
         const loadedClientsData = await Database.getAllClients();
         setClientsData(loadedClientsData);
@@ -76,13 +77,17 @@ export default function MinhasVendas() {
         setSalesData(loadedSalesData);
     }
 
+	const loaders = {
+		loadClients: loadClients,
+		loadProducts: loadProducts,
+		loadSales: loadSales
+	};
+
     useEffect(() => {
-      (async () => {
-        await Database.initializeDatabase();
-        await loadClients();
-        await loadProducts();
-		await loadSales();
-      })();
+        Database.initializeDatabase();
+        loadClients();
+        loadProducts();
+		loadSales();
     }, []);
 
     return (
@@ -93,12 +98,13 @@ export default function MinhasVendas() {
                         clientsData.map((client) => (
                             <View key={client.clientId} style={styles.clientCard}>
 
-                                <TouchableOpacity style={styles.cardBox} onLongPress={() => {
-                                    setCurrElementName(client.name);
-                                    setCurrElementId(client.clientId);
-                                    setCurrElementType('client');
-                                    openDeleteModal();
-                                }}>
+                                <TouchableOpacity style={styles.cardBox} 
+									onLongPress={() => {
+										setCurrElementName(client.name);
+										setCurrElementId(client.clientId);
+										setCurrElementType('client');
+										openDeleteModal();
+									}}>
                                     <Text style={styles.cardTitle}>{client.name}</Text>
                                     <TouchableOpacity onPress={() => { 
                                         setCurrClientId(client.clientId)
@@ -117,8 +123,8 @@ export default function MinhasVendas() {
 											<View key={product.productId}>
 												<TouchableOpacity style={styles.productBox}
 													onLongPress={() => { 
-														setCurrElementName(product.name);
 														setCurrElementId(product.productId);
+														setCurrElementName(product.name);
 														setCurrElementType('product');
 														openDeleteModal();
 													}}
@@ -143,8 +149,11 @@ export default function MinhasVendas() {
 														sale.clientId === client.clientId && sale.productId === product.productId ?
 														<TouchableOpacity key={sale.saleId}
 															style={styles.saleBox}
-															onLongPress={() => {
-
+															onLongPress={() => { 
+																setCurrElementId(sale.saleId);
+																setCurrElementName(product.name);
+																setCurrElementType('sale');
+																openDeleteModal();
 															}}
 														>
 															<View style={styles.saleBoxDesc}>
@@ -190,7 +199,7 @@ export default function MinhasVendas() {
 
             <NewClient visible={isClientModalVisible} 
                 closeModal={closeClientModal}
-                reloadClients={loadClients}
+                reloadClients={loaders.loadClients}
                 id={currClientId}
                 name={currClientName}
                 isNew={isNew}
@@ -198,7 +207,7 @@ export default function MinhasVendas() {
 
             <NewProduct visible={isProductModalVisible} 
                 closeModal={closeProductModal}
-                reloadProducts={loadProducts}
+                reloadProducts={loaders.loadProducts}
 				clientId={currClientId}
                 id={currProductId}
                 name={currProductName}
@@ -212,13 +221,12 @@ export default function MinhasVendas() {
                 id={currSaleId}
 				date={currSaleDate}
 				value={currSaleValue}
-				reloadSales={loadSales}
+				reloadSales={loaders.loadSales}
                 isNew={isNew}
             />
             
             <DeleteElement visible={isDeleteModalVisible}
-                reloadParents={loadClients}
-                reloadChildren={loadProducts}
+				loaders={loaders}
                 closeModal={closeDeleteModal}
                 id={currElementId}
                 name={currElementName}

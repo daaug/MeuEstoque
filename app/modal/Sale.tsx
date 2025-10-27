@@ -57,6 +57,7 @@ export default function NewSale({visible, closeModal, reloadSales, id, clientId,
 						<View style={styles.dateBoxElements}>
 							<Text style={styles.campoTitulo}>dia</Text>
 							<TextInput style={styles.input}
+								inputMode="numeric"
 								value={saleDay}
 								maxLength={2}
 								onChangeText={setSaleDay}
@@ -65,6 +66,7 @@ export default function NewSale({visible, closeModal, reloadSales, id, clientId,
 						<View style={styles.dateBoxElements}>
 							<Text style={styles.campoTitulo}>mês</Text>
 							<TextInput style={styles.input}
+								inputMode="numeric"
 								value={saleMonth}
 								maxLength={2}
 								onChangeText={setSaleMonth}
@@ -73,6 +75,7 @@ export default function NewSale({visible, closeModal, reloadSales, id, clientId,
 						<View style={styles.dateBoxElements}>
 							<Text style={styles.campoTitulo}>ano</Text>
 							<TextInput style={styles.input}
+								inputMode="numeric"
 								value={saleYear}
 								maxLength={4}
 								onChangeText={setSaleYear}

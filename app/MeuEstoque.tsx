@@ -61,15 +61,15 @@ export default function MeuEstoque() {
         setSectionsData(loadedSectionsData);
     }
 
+	const loaders = {
+		loadSections: loadSections,
+		loadItems: loadItems
+	}
+
     useEffect(() => {
-      //  Database.initializeDatabase();
-      //  loadSections();
-      //  loadItems();
-      (async () => {
-        await Database.initializeDatabase();
-        await loadSections();
-        await loadItems();
-      })();
+		Database.initializeDatabase();
+        loadSections();
+        loadItems();
     }, []);
 
     return (
@@ -169,8 +169,7 @@ export default function MeuEstoque() {
             />
             
             <DeleteElement visible={isDeleteModalVisible}
-                reloadParents={loadSections}
-                reloadChildren={loadItems}
+				loaders={loaders}
                 closeModal={closeDeleteModal}
                 id={currElementId}
                 name={currElementName}

@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
-import { Modal, View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Database from "../database/EstoqueDatabase";
 
 interface ModalProps {
     visible: boolean;
     closeModal: () => void;
-    reloadParents: () => void;
-    reloadChildren: () => void;
+	loaders: Record<string, any>;
     id: string;
     name: string;
     type: string;
 }
 
-export default function DeleteElement({visible, closeModal, reloadParents, reloadChildren, name, id, type}: ModalProps) {
+export default function DeleteElement({visible, closeModal, loaders, name, id, type}: ModalProps) {
     const [elementName, setElementName] = useState(name);
     const [elementId, setElementId] = useState(id);
     const [elementType, setElementType] = useState(type);
@@ -33,7 +32,7 @@ export default function DeleteElement({visible, closeModal, reloadParents, reloa
                 <View style={styles.viewElements}>
                     <View style={styles.boxTitulo}>
                         <Text style={styles.campoTitulo}>Tem certeza que deseja remover:</Text>
-                        <Text style={styles.campoTitulo}>{elementName}</Text>
+                        <Text style={styles.campoTitulo}>{elementType === 'sale' ? `Venda de ${elementName}` : elementName}</Text>
                     </View>
 
                     <View style={styles.buttons}>
@@ -46,19 +45,48 @@ export default function DeleteElement({visible, closeModal, reloadParents, reloa
                         <TouchableOpacity style={styles.btnDeletar}
                             onPress={() => {
                                 const deleteElement = async () => {
-                                    if (elementType === 'section'){
-                                        Database.deleteSection(parseInt(elementId)).then(() => {
-                                            reloadChildren();
-                                            reloadParents();
-                                            closeModal();
-                                        });
-                                    } else if (elementType === 'item'){
-                                        Database.deleteItem(parseInt(elementId)).then(() => {
-                                            reloadChildren();
-                                            reloadParents();
-                                            closeModal();
-                                        });
-                                    }
+									switch (elementType) {
+										case 'section':
+											Database.deleteSection(parseInt(elementId)).then(() => {
+												//reloadChildren();
+												//reloadParents();
+												loaders.loadSections();
+												closeModal();
+											});
+										break;
+										case 'item':
+											Database.deleteItem(parseInt(elementId)).then(() => {
+												//reloadChildren();
+												//reloadParents();
+												loaders.loadItems();
+												closeModal();
+											});
+										break;
+										case 'client':
+											Database.deleteClient(parseInt(elementId)).then(() => {
+												//reloadChildren();
+												//reloadParents();
+												loaders.loadClients();
+												closeModal();
+											});
+										break;
+										case 'product':
+											Database.deleteProduct(parseInt(elementId)).then(() => {
+												//reloadChildren();
+												//reloadParents();
+												loaders.loadProducts();
+												closeModal();
+											});
+										break;
+										case 'sale':
+											Database.deleteSale(parseInt(elementId)).then(() => {
+												//reloadChildren();
+												//reloadParents();
+												loaders.loadSales();
+												closeModal();
+											});
+										break;
+									}
                                 }
 
                                 deleteElement();

@@ -281,16 +281,17 @@ export default class Database {
     }
     static async deleteItem(itemId: number) {
         const db = await getDBConnection();
-        const result = await db.runAsync(
+        await db.runAsync(
             `
             DELETE FROM items
                 WHERE itemId = ?
             `,
             [itemId]
         );
-        return result;
     }
     static async deleteClient(clientId: number) {
+		await this.deleteAllSalesFromClient(clientId);
+		await this.deleteAllProductsFromClient(clientId);
         const db = await getDBConnection();
         const result = await db.runAsync(
             `
@@ -302,26 +303,25 @@ export default class Database {
         return result;
     }
     static async deleteProduct(productId: number) {
+		await this.deleteAllSalesFromProduct(productId);
         const db = await getDBConnection();
-        const result = await db.runAsync(
+        await db.runAsync(
             `
             DELETE FROM products
                 WHERE productId = ?
             `,
             [productId]
         );
-        return result;
     }
     static async deleteSale(saleId: number) {
         const db = await getDBConnection();
-        const result = await db.runAsync(
+        await db.runAsync(
             `
             DELETE FROM sales
                 WHERE saleId = ?
             `,
             [saleId]
         );
-        return result;
     }
 
     //
@@ -329,25 +329,44 @@ export default class Database {
     //
     static async deleteAllItemsFromSection(sectionId: number) {
         const db = await getDBConnection();
-        const result = await db.runAsync(
+        await db.runAsync(
             `
             DELETE FROM items
                 WHERE sectionId = ?
             `,
             [sectionId]
         );
-        return result;
     }
-    static async deleteAllSalesFromClient(clientId: number) {
+    static async deleteAllProductsFromClient(clientid: number) {
+		await this.deleteAllSalesFromClient(clientid);
         const db = await getDBConnection();
-        const result = await db.runAsync(
+        await db.runAsync(
+            `
+            DELETE FROM products
+                WHERE clientid = ?
+            `,
+            [clientid]
+        );
+    }
+    static async deleteAllSalesFromClient(clientid: number) {
+        const db = await getDBConnection();
+        await db.runAsync(
             `
             DELETE FROM sales
-                WHERE clientId = ?
+                WHERE clientid = ?
             `,
-            [clientId]
+            [clientid]
         );
-        return result;
+    }
+    static async deleteAllSalesFromProduct(productId: number) {
+        const db = await getDBConnection();
+        await db.runAsync(
+            `
+            DELETE FROM sales
+                WHERE productId = ?
+            `,
+            [productId]
+        );
     }
 
 }
