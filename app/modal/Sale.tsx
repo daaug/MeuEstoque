@@ -6,6 +6,7 @@ interface ModalProps {
     visible: boolean;
     closeModal: () => void;
     reloadSales: () => void;
+	db: Database
     id: string;
     clientId: string;
     productId: string;
@@ -14,7 +15,7 @@ interface ModalProps {
     isNew: boolean;
 }
 
-export default function NewSale({visible, closeModal, reloadSales, id, clientId, productId, value, date, isNew}: ModalProps) {
+export default function NewSale({visible, closeModal, reloadSales, db, id, clientId, productId, value, date, isNew}: ModalProps) {
 
     const [saleId, setSaleId] = useState('');
     const [saleClientId, setSaleClientId] = useState('');
@@ -95,12 +96,12 @@ export default function NewSale({visible, closeModal, reloadSales, id, clientId,
                             onPress={() => {
                                 const updateOrInsertItem = () => {
                                     if (isNew){
-                                        Database.insertSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), `${saleDay}/${saleMonth}/${saleYear}`).then(() => {
+                                        db.insertSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), `${saleDay}/${saleMonth}/${saleYear}`).then(() => {
                                             reloadSales();
                                             closeModal();
                                         });
                                     } else {
-                                        Database.updateSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), `${saleDay}/${saleMonth}/${saleYear}`).then(() => {
+                                        db.updateSale(parseInt(saleClientId), parseInt(saleProductId), parseFloat(saleValue), `${saleDay}/${saleMonth}/${saleYear}`).then(() => {
                                             reloadSales();
                                             closeModal();
                                         });

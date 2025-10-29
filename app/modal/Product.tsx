@@ -6,13 +6,14 @@ interface ModalProps {
     visible: boolean;
     closeModal: () => void;
     reloadProducts: () => void;
+	db: Database;
     id: string;
     clientId: string;
     name: string;
     isNew: boolean;
 }
 
-export default function NewProduct({visible, closeModal, reloadProducts, id, clientId, name, isNew}: ModalProps) {
+export default function NewProduct({visible, closeModal, reloadProducts, db, id, clientId, name, isNew}: ModalProps) {
 
     const [productClientId, setProductClientId] = useState(clientId);
     const [productId, setProductId] = useState(id);
@@ -52,12 +53,12 @@ export default function NewProduct({visible, closeModal, reloadProducts, id, cli
                             onPress={() => {
                                 const updateOrInsertProduct = () => {
                                     if (isNew){
-                                        Database.insertProduct(productName, parseInt(productClientId)).then(() => {
+                                        db.insertProduct(productName, parseInt(productClientId)).then(() => {
                                             reloadProducts();
                                             closeModal();
                                         });
                                     } else {
-                                        Database.updateProduct(parseInt(productId), productName).then(() => {
+                                        db.updateProduct(parseInt(productId), productName).then(() => {
                                             reloadProducts();
                                             closeModal();
                                         });

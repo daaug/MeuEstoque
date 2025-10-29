@@ -6,12 +6,13 @@ interface ModalProps {
     visible: boolean;
     closeModal: () => void;
     reloadSections: () => void;
+	db: Database;
     name: string;
     id: string;
     isNew: boolean;
 }
 
-export default function NewSection({visible, closeModal, reloadSections, name, id, isNew}: ModalProps) {
+export default function NewSection({visible, closeModal, reloadSections, db, name, id, isNew}: ModalProps) {
     const [sectionName, setSectionName] = useState(name);
     const [sectionId, setSectionId] = useState(id);
 
@@ -48,12 +49,12 @@ export default function NewSection({visible, closeModal, reloadSections, name, i
                             onPress={() => {
                                 const updateOrInsertSection = () => {
                                     if (isNew){
-                                        Database.insertSection(sectionName).then(() => {
+                                        db.insertSection(sectionName).then(() => {
                                             reloadSections();
                                             closeModal();
                                         });
                                     } else {
-                                        Database.updateSection(parseInt(sectionId), sectionName).then(() => {
+                                        db.updateSection(parseInt(sectionId), sectionName).then(() => {
                                             reloadSections();
                                             closeModal();
                                         });

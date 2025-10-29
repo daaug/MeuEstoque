@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Platform } from 'react-native';
 import NewSection from './modal/Section';
 import DeleteElement from './modal/deleteElement';
@@ -51,13 +51,35 @@ export default function MeuEstoque() {
     const [sectionsData, setSectionsData] = useState<any[]>([]);
     const [itemsData, setItemsData] = useState<any[]>([]);
 
+	const measures: Record<'g' | 'ml' | 'un', string>= {
+		g: "Kg",
+		ml: "L",
+		un: "un"
+	};
+
+	const betterMeasure = (value: number, measure: string) => {
+		let v;
+		let m;
+
+		if (measure === "g" || measure === "ml") {
+			if (value >= 1000){
+				v = value / 1000;
+				m = measures[measure];
+				return `${v}${m}`
+			}
+		}
+		return `${value}${measure}`;
+	}
+
+	const db = new Database;
+
     const loadItems = async () => {
-        const loadedItemsData = await Database.getAllItems();
+        const loadedItemsData = await db.getAllItems();
         setItemsData(loadedItemsData);
     }
 
     const loadSections = async () => {
-        const loadedSectionsData = await Database.getAllSections();
+        const loadedSectionsData = await db.getAllSections();
         setSectionsData(loadedSectionsData);
     }
 
@@ -67,10 +89,10 @@ export default function MeuEstoque() {
 	}
 
     useEffect(() => {
-		Database.initializeDatabase();
-        loadSections();
-        loadItems();
-    }, []);
+		db.initializeDatabase();
+		loadSections();
+		loadItems();
+    }, [db, loadItems, loadSections]);
 
     return (
         <View style={styles.container}>
@@ -111,7 +133,7 @@ export default function MeuEstoque() {
                                             >
                                                 <Text style={styles.itemText}>{item.name}</Text>
                                                 <View style={styles.itemMeasureBox}>
-                                                    <Text style={styles.itemText}>{item.value}{item.measure}</Text>
+                                                    <Text style={styles.itemText}>{betterMeasure(item.value, item.measure)}</Text>
                                                     <TouchableOpacity 
                                                         onPress={() => { 
                                                             setCurrSectionId(item.sectionId)
@@ -151,6 +173,7 @@ export default function MeuEstoque() {
             <NewSection visible={isSectionModalVisible} 
                 closeModal={closeSectionModal}
                 reloadSections={loadSections}
+				db={db}
                 id={currSectionId}
                 name={currSectionName}
                 isNew={isNew}
@@ -161,6 +184,7 @@ export default function MeuEstoque() {
                 reloadItems={loadItems}
                 reloadSections={loadSections}
                 sectionId={currSectionId}
+				db={db}
                 id={currItemId}
                 name={currItemName}
                 value={currItemValue}
@@ -171,6 +195,7 @@ export default function MeuEstoque() {
             <DeleteElement visible={isDeleteModalVisible}
 				loaders={loaders}
                 closeModal={closeDeleteModal}
+				db={db}
                 id={currElementId}
                 name={currElementName}
                 type={currType}

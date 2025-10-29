@@ -5,7 +5,7 @@ export const getDBConnection = async (): Promise<SQLiteDatabase> => {
 };
 
 export default class Database {
-    static async initializeDatabase() {
+     async initializeDatabase() {
         try {
             const db = await getDBConnection();
             await db.execAsync(
@@ -50,7 +50,7 @@ export default class Database {
         }
     }
 
-    static async dropTables() {
+     async dropTables() {
         const db = await getDBConnection();
         await db.execAsync(
             `
@@ -66,7 +66,7 @@ export default class Database {
     //
     // INSERTERS
     //
-    static async insertSection(name: string) {
+     async insertSection(name: string) {
         const db = await getDBConnection();
         await db.runAsync(
             `
@@ -76,7 +76,7 @@ export default class Database {
             [name]
         );
     }
-    static async insertItem(name: string, value: number, measure: string, sectionId: number) {
+     async insertItem(name: string, value: number, measure: string, sectionId: number) {
         const db = await getDBConnection();
         await db.runAsync(
             `
@@ -86,7 +86,7 @@ export default class Database {
             [name, value, measure, sectionId]
         );
     }
-    static async insertClient(name: string) {
+     async insertClient(name: string) {
         const db = await getDBConnection();
         await db.runAsync(
             `
@@ -96,7 +96,7 @@ export default class Database {
             [name]
         );
     }
-    static async insertProduct(name: string, clientId: number) {
+     async insertProduct(name: string, clientId: number) {
         const db = await getDBConnection();
         await db.runAsync(
             `
@@ -106,7 +106,7 @@ export default class Database {
             [name, clientId]
         );
     }
-    static async insertSale(clientId: number, productId: number, value: number, date: string) {
+     async insertSale(clientId: number, productId: number, value: number, date: string) {
         const db = await getDBConnection();
         await db.runAsync(
             `
@@ -120,28 +120,28 @@ export default class Database {
     //
     // SIMPLE GETTERS
     //
-    static async getSection() {
+     async getSection() {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `SELECT * FROM sections`
         );
         return result;
     }
-    static async getClients() {
+     async getClients() {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `SELECT * FROM clients`
         );
         return result;
     }
-    static async getProducts() {
+     async getProducts() {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `SELECT * FROM products`
         );
         return result;
     }
-    static async getSales() {
+     async getSales() {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `SELECT * FROM sales`
@@ -152,7 +152,7 @@ export default class Database {
     //
     // UPDATERS
     //
-    static async updateSection(sectionId: number, name: string) {
+     async updateSection(sectionId: number, name: string) {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `
@@ -164,7 +164,7 @@ export default class Database {
         );
         return result;
     }
-    static async updateItem(itemId: number, name: string, value: number, measure: string) {
+     async updateItem(itemId: number, name: string, value: number, measure: string) {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `
@@ -178,7 +178,7 @@ export default class Database {
         );
         return result;
     }
-    static async updateClient(clientId: number, name: string) {
+     async updateClient(clientId: number, name: string) {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `
@@ -190,7 +190,7 @@ export default class Database {
         );
         return result;
     }
-    static async updateProduct(productId: number, name: string) {
+     async updateProduct(productId: number, name: string) {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `
@@ -202,7 +202,7 @@ export default class Database {
         );
         return result;
     }
-    static async updateSale(clientId: number, productId: number, value: number, date: string) {
+     async updateSale(clientId: number, productId: number, value: number, date: string) {
         const db = await getDBConnection();
         const result = await db.runAsync(
             `
@@ -221,14 +221,14 @@ export default class Database {
     //
     // GETTERS - ALL
     //
-    static async getAllSections() {
+     async getAllSections() {
         const db = await getDBConnection();
         const result = await db.getAllAsync(
             `SELECT * FROM sections`
         );
         return result;
     }
-    static async getAllItems() {
+     async getAllItems() {
         const db = await getDBConnection();
         const result = await db.getAllAsync(
             `
@@ -237,7 +237,7 @@ export default class Database {
         );
         return result;
     }
-    static async getAllClients() {
+     async getAllClients() {
         const db = await getDBConnection();
         const result = await db.getAllAsync(
             `
@@ -246,7 +246,7 @@ export default class Database {
         );
         return result;
     }
-    static async getAllProducts() {
+     async getAllProducts() {
         const db = await getDBConnection();
         const result = await db.getAllAsync(
             `
@@ -255,7 +255,7 @@ export default class Database {
         );
         return result;
     }
-    static async getAllSales() {
+     async getAllSales() {
         const db = await getDBConnection();
         const result = await db.getAllAsync(
             `
@@ -268,7 +268,7 @@ export default class Database {
     //
     // DELETERS
     //
-    static async deleteSection(sectionId: number) {
+     async deleteSection(sectionId: number) {
         await this.deleteAllItemsFromSection(sectionId);
         const db = await getDBConnection();
         await db.runAsync(
@@ -279,7 +279,7 @@ export default class Database {
             [sectionId]
         );
     }
-    static async deleteItem(itemId: number) {
+     async deleteItem(itemId: number) {
         const db = await getDBConnection();
         await db.runAsync(
             `
@@ -289,7 +289,7 @@ export default class Database {
             [itemId]
         );
     }
-    static async deleteClient(clientId: number) {
+     async deleteClient(clientId: number) {
 		await this.deleteAllSalesFromClient(clientId);
 		await this.deleteAllProductsFromClient(clientId);
         const db = await getDBConnection();
@@ -302,7 +302,7 @@ export default class Database {
         );
         return result;
     }
-    static async deleteProduct(productId: number) {
+     async deleteProduct(productId: number) {
 		await this.deleteAllSalesFromProduct(productId);
         const db = await getDBConnection();
         await db.runAsync(
@@ -313,7 +313,7 @@ export default class Database {
             [productId]
         );
     }
-    static async deleteSale(saleId: number) {
+     async deleteSale(saleId: number) {
         const db = await getDBConnection();
         await db.runAsync(
             `
@@ -327,7 +327,7 @@ export default class Database {
     //
     // DELETE ALL
     //
-    static async deleteAllItemsFromSection(sectionId: number) {
+     async deleteAllItemsFromSection(sectionId: number) {
         const db = await getDBConnection();
         await db.runAsync(
             `
@@ -337,7 +337,7 @@ export default class Database {
             [sectionId]
         );
     }
-    static async deleteAllProductsFromClient(clientid: number) {
+     async deleteAllProductsFromClient(clientid: number) {
 		await this.deleteAllSalesFromClient(clientid);
         const db = await getDBConnection();
         await db.runAsync(
@@ -348,7 +348,7 @@ export default class Database {
             [clientid]
         );
     }
-    static async deleteAllSalesFromClient(clientid: number) {
+     async deleteAllSalesFromClient(clientid: number) {
         const db = await getDBConnection();
         await db.runAsync(
             `
@@ -358,7 +358,7 @@ export default class Database {
             [clientid]
         );
     }
-    static async deleteAllSalesFromProduct(productId: number) {
+     async deleteAllSalesFromProduct(productId: number) {
         const db = await getDBConnection();
         await db.runAsync(
             `

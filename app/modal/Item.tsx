@@ -8,6 +8,7 @@ interface ModalProps {
     closeModal: () => void;
     reloadItems: () => void;
     reloadSections: () => void;
+	db: Database;
     id: string;
     name: string;
     value: string;
@@ -16,12 +17,13 @@ interface ModalProps {
     isNew: boolean;
 }
 
-export default function NewItem({visible, closeModal, reloadItems, reloadSections, id, name, value, measure, sectionId, isNew}: ModalProps) {
+export default function NewItem({visible, closeModal, reloadItems, db, id, name, value, measure, sectionId, isNew}: ModalProps) {
 
     const [itemName, setItemName] = useState(name);
     const [itemValue, setItemValue] = useState(value);
     const [itemId, setItemId] = useState(id);
     const [radioButtonSelected, setRadioButtonSelected] = useState(measure);
+    const [radioButtonSelectedText, setRadioButtonSelectedText] = useState('gramas');
 
     useEffect(() => {
         setItemId(id);
@@ -51,7 +53,7 @@ export default function NewItem({visible, closeModal, reloadItems, reloadSection
                         <Text style={styles.campoTitulo}>Unidade de Medida:</Text>
                         <TouchableOpacity
                             style={styles.radioBox}
-                            onPress={() => {setRadioButtonSelected('g')}}
+                            onPress={() => {setRadioButtonSelected('g'); setRadioButtonSelectedText('gramas')}}
                         >
                             <MaterialIcons name={radioButtonSelected === 'g' ? "radio-button-on" : "radio-button-off"} size={25} color="#000000" />
                             <Text>gramas</Text>
@@ -59,15 +61,15 @@ export default function NewItem({visible, closeModal, reloadItems, reloadSection
 
                         <TouchableOpacity
                             style={styles.radioBox}
-                            onPress={() => {setRadioButtonSelected('L')}}
+                            onPress={() => {setRadioButtonSelected('ml'); setRadioButtonSelectedText('mililitros')}}
                         >
-                            <MaterialIcons name={radioButtonSelected === 'L' ? "radio-button-on" : "radio-button-off"} size={25} color="#000000" />
-                            <Text>litros</Text>
+                            <MaterialIcons name={radioButtonSelected === 'ml' ? "radio-button-on" : "radio-button-off"} size={25} color="#000000" />
+                            <Text>mililitros</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
                             style={styles.radioBox}
-                            onPress={() => {setRadioButtonSelected('un')}}
+                            onPress={() => {setRadioButtonSelected('un'); setRadioButtonSelectedText('unidades')}}
                         >
                             <MaterialIcons name={radioButtonSelected === 'un' ? "radio-button-on" : "radio-button-off"} size={25} color="#000000" />
                             <Text>unidades</Text>
@@ -75,7 +77,7 @@ export default function NewItem({visible, closeModal, reloadItems, reloadSection
                     </View>
 
                     <View>
-                        <Text style={styles.campoTitulo}>Valor da Unidade de Medida:</Text>
+                        <Text style={styles.campoTitulo}>Quantidade em {radioButtonSelectedText}:</Text>
                         <TextInput style={styles.input}
                             keyboardType="numeric"
                             value={itemValue}
@@ -91,22 +93,19 @@ export default function NewItem({visible, closeModal, reloadItems, reloadSection
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.btnSave}
-                            onPress={() => {
-                                const updateOrInsertItem = () => {
+                            onPress={async () => {
                                     if (isNew){
-                                        Database.insertItem(itemName, parseInt(itemValue) || 0, radioButtonSelected, parseInt(sectionId)).then(() => {
+                                        await db.insertItem(itemName, parseInt(itemValue) || 0, radioButtonSelected, parseInt(sectionId)).then(() => {
                                             reloadItems();
                                             closeModal();
                                         });
                                     } else {
-                                        Database.updateItem(parseInt(itemId), itemName, parseInt(itemValue) || 0, radioButtonSelected).then(() => {
+                                        await db.updateItem(parseInt(itemId), itemName, parseInt(itemValue) || 0, radioButtonSelected).then(() => {
                                             reloadItems();
                                             closeModal();
                                         });
                                     }
-                                }
 
-                                updateOrInsertItem();
                             }}
                         >
                             <Text style={styles.textSave}>Salvar</Text>

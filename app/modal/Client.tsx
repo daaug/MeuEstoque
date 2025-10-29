@@ -6,12 +6,13 @@ interface ModalProps {
     visible: boolean;
     closeModal: () => void;
     reloadClients: () => void;
+	db: Database;
     name: string;
     id: string;
     isNew: boolean;
 }
 
-export default function NewClient({visible, closeModal, reloadClients, name, id, isNew}: ModalProps) {
+export default function NewClient({visible, closeModal, reloadClients, db, name, id, isNew}: ModalProps) {
     const [clientName, setClientName] = useState(name);
     const [clientId, setClientId] = useState(id);
 
@@ -48,12 +49,12 @@ export default function NewClient({visible, closeModal, reloadClients, name, id,
                             onPress={() => {
                                 const updateOrInsertClient = () => {
                                     if (isNew){
-                                        Database.insertClient(clientName).then(() => {
+                                        db.insertClient(clientName).then(() => {
                                             reloadClients();
                                             closeModal();
                                         });
                                     } else {
-                                        Database.updateClient(parseInt(clientId), clientName).then(() => {
+                                        db.updateClient(parseInt(clientId), clientName).then(() => {
                                             reloadClients();
                                             closeModal();
                                         });

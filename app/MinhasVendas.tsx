@@ -63,17 +63,18 @@ export default function MinhasVendas() {
     const [productsData, setProductsData] = useState<any[]>([]);
     const [salesData, setSalesData] = useState<any[]>([]);
 
+	const db = new Database;
 
     const loadClients = async () => {
-        const loadedClientsData = await Database.getAllClients();
+        const loadedClientsData = await db.getAllClients();
         setClientsData(loadedClientsData);
     }
     const loadProducts = async () => {
-        const loadedProductsData = await Database.getAllProducts();
+        const loadedProductsData = await db.getAllProducts();
         setProductsData(loadedProductsData);
     }
     const loadSales = async () => {
-        const loadedSalesData = await Database.getAllSales();
+        const loadedSalesData = await db.getAllSales();
         setSalesData(loadedSalesData);
     }
 
@@ -84,11 +85,11 @@ export default function MinhasVendas() {
 	};
 
     useEffect(() => {
-        Database.initializeDatabase();
+        db.initializeDatabase();
         loadClients();
         loadProducts();
 		loadSales();
-    }, []);
+    }, [db, loadClients, loadProducts, loadSales]);
 
     return (
         <View style={styles.container}>
@@ -200,6 +201,7 @@ export default function MinhasVendas() {
             <NewClient visible={isClientModalVisible} 
                 closeModal={closeClientModal}
                 reloadClients={loaders.loadClients}
+				db={db}
                 id={currClientId}
                 name={currClientName}
                 isNew={isNew}
@@ -209,6 +211,7 @@ export default function MinhasVendas() {
                 closeModal={closeProductModal}
                 reloadProducts={loaders.loadProducts}
 				clientId={currClientId}
+				db={db}
                 id={currProductId}
                 name={currProductName}
                 isNew={isNew}
@@ -218,6 +221,7 @@ export default function MinhasVendas() {
                 closeModal={closeSaleModal}
 				clientId={currClientId}
 				productId={currProductId}
+				db={db}
                 id={currSaleId}
 				date={currSaleDate}
 				value={currSaleValue}
@@ -228,6 +232,7 @@ export default function MinhasVendas() {
             <DeleteElement visible={isDeleteModalVisible}
 				loaders={loaders}
                 closeModal={closeDeleteModal}
+				db={db}
                 id={currElementId}
                 name={currElementName}
                 type={currType}

@@ -6,12 +6,13 @@ interface ModalProps {
     visible: boolean;
     closeModal: () => void;
 	loaders: Record<string, any>;
+	db: Database;
     id: string;
     name: string;
     type: string;
 }
 
-export default function DeleteElement({visible, closeModal, loaders, name, id, type}: ModalProps) {
+export default function DeleteElement({visible, closeModal, db, loaders, name, id, type}: ModalProps) {
     const [elementName, setElementName] = useState(name);
     const [elementId, setElementId] = useState(id);
     const [elementType, setElementType] = useState(type);
@@ -47,7 +48,7 @@ export default function DeleteElement({visible, closeModal, loaders, name, id, t
                                 const deleteElement = async () => {
 									switch (elementType) {
 										case 'section':
-											Database.deleteSection(parseInt(elementId)).then(() => {
+											db.deleteSection(parseInt(elementId)).then(() => {
 												//reloadChildren();
 												//reloadParents();
 												loaders.loadSections();
@@ -55,7 +56,7 @@ export default function DeleteElement({visible, closeModal, loaders, name, id, t
 											});
 										break;
 										case 'item':
-											Database.deleteItem(parseInt(elementId)).then(() => {
+											db.deleteItem(parseInt(elementId)).then(() => {
 												//reloadChildren();
 												//reloadParents();
 												loaders.loadItems();
@@ -63,7 +64,7 @@ export default function DeleteElement({visible, closeModal, loaders, name, id, t
 											});
 										break;
 										case 'client':
-											Database.deleteClient(parseInt(elementId)).then(() => {
+											db.deleteClient(parseInt(elementId)).then(() => {
 												//reloadChildren();
 												//reloadParents();
 												loaders.loadClients();
@@ -71,7 +72,7 @@ export default function DeleteElement({visible, closeModal, loaders, name, id, t
 											});
 										break;
 										case 'product':
-											Database.deleteProduct(parseInt(elementId)).then(() => {
+											db.deleteProduct(parseInt(elementId)).then(() => {
 												//reloadChildren();
 												//reloadParents();
 												loaders.loadProducts();
@@ -79,7 +80,7 @@ export default function DeleteElement({visible, closeModal, loaders, name, id, t
 											});
 										break;
 										case 'sale':
-											Database.deleteSale(parseInt(elementId)).then(() => {
+											db.deleteSale(parseInt(elementId)).then(() => {
 												//reloadChildren();
 												//reloadParents();
 												loaders.loadSales();
